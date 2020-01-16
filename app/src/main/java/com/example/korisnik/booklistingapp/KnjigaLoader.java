@@ -10,7 +10,7 @@ import java.util.List;
  */
 
 public class KnjigaLoader extends android.content.AsyncTaskLoader<List<Knjiga>>{
-    /** Query URL */
+    /** zahtev za URl-om */
     private String mUrl;
     public KnjigaLoader(Context context,String url) {
         super(context);
@@ -37,7 +37,7 @@ public class KnjigaLoader extends android.content.AsyncTaskLoader<List<Knjiga>>{
             return null;
         }
 
-        // Perform the network request, parse the response, and extract a list of earthquakes.
+        //Fraziram odgovor i ekstraktujem listu knjiga
         List<Knjiga> knjige = QueryUtilis.fetchKnjige(mUrl);
         return knjige;
     }

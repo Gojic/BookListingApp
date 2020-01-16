@@ -7,15 +7,15 @@ package com.example.korisnik.booklistingapp;
 public class Knjiga {
     private String mImeKnjige;
     private String mAutorKnjige;
-
-
     private String mSlikaId ;
+    private String urlBook;
 
 
-    public Knjiga(String mImeKnjige, String mAutorKnjige, String mSlikaId) {
+    public Knjiga(String mImeKnjige, String mAutorKnjige, String mSlikaId,String urlBook) {
         this.mImeKnjige = mImeKnjige;
         this.mAutorKnjige = mAutorKnjige;
         this.mSlikaId = mSlikaId;
+        this.urlBook = urlBook;
 
     }
 
@@ -31,5 +31,9 @@ public class Knjiga {
 
     public String getmSlikaId() {
         return mSlikaId;
+    }
+
+    public String getUrlBook() {
+        return urlBook;
     }
 }

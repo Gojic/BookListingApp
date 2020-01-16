@@ -24,12 +24,13 @@ import java.util.List;
 public class QueryUtilis {
 
     private static final String LOG_TAG = QueryUtilis.class.getSimpleName();
+
     //kreiramo prazan konstruktor zato sto niko ne bi trebao da pravi objekat od ove klase
     private QueryUtilis() {
     }
 
     //metod sa kojim saljemo upit od goole APi i vratcam kao listu
-    public static ArrayList <Knjiga> fetchKnjige (String traziURL){
+    public static ArrayList<Knjiga> fetchKnjige(String traziURL) {
         //kreiram URL objekat
         URL url = createURL(traziURL);
         // izvrsava HTTP zahtev i dobija odgovor u JSON
@@ -40,7 +41,7 @@ public class QueryUtilis {
             Log.e(LOG_TAG, "problem sa kreiranjem HTTP zahteva" + e);
         }
 
-        ArrayList <Knjiga> knjige = extractFeatureFromJson(jsonOdgovor);
+        ArrayList<Knjiga> knjige = extractFeatureFromJson(jsonOdgovor);
         return knjige;
     }
 
@@ -58,11 +59,12 @@ public class QueryUtilis {
         return url;
 
     }
+
     //kreiram HTTP zahtev za datu URL adresu i vratiti odgovor u String formatu
     private static String makeHttpRequest(URL url) throws IOException {
         String jsonOdgovor = "";
         //ako je url null odnosno ne postoji ran ije izaci iz ove metode
-        if (url == null){
+        if (url == null) {
             return jsonOdgovor;
         }
         HttpURLConnection httpURLConnection = null;
@@ -77,17 +79,15 @@ public class QueryUtilis {
 
             //ako je konekcija uspesna odnosno ako je kod odgovora 200
             //onda iscitati input stream i frazirati odgovor
-            if (httpURLConnection.getResponseCode() == 200){
+            if (httpURLConnection.getResponseCode() == 200) {
                 inputStream = httpURLConnection.getInputStream();
                 jsonOdgovor = readFromStream(inputStream);
-            }
-            else {
+            } else {
                 Log.e(LOG_TAG, "POgresan response kod: " + httpURLConnection.getResponseCode());
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             //ova linija koda se uvek izvrsava
             if (httpURLConnection != null) {
                 httpURLConnection.disconnect();
@@ -100,6 +100,7 @@ public class QueryUtilis {
         }
         return jsonOdgovor;
     }
+
     //konvertuje InputStream u string koji sadrzi ceo JSON odgovor sa servera
     private static String readFromStream(InputStream inputStream) throws IOException {
         //kreiram StringBuilde objekat
@@ -107,9 +108,9 @@ public class QueryUtilis {
         //ukolliko inputStream nije prazan
         if (inputStream != null) {
             //kreiram InputStreamReader objekat kao argument uzimam inputStrem
-            //i Charset,koji soecifira kako da prevedeinputStream podatke u citljive karaktere bajt po bajt
+            //i Charset,koji specifira kako da prevede inputStream podatke u citljive karaktere bajt po bajt
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream, Charset.forName("UTF-8"));
-            //BufferedReader uzima inputSTreamRedaer za argument zato sto uzima opdatke uz inputStreamReadera
+            //BufferedReader uzima inputSTreamRedaer za argument zato sto uzima podatke uz inputStreamReadera
             //i omogocuje da citamo liniku teksta op liniju
             BufferedReader reader = new BufferedReader(inputStreamReader);
             //cita liniju teksta
@@ -125,7 +126,7 @@ public class QueryUtilis {
     }
 
     //ovaj metod vraca listu Knjiga objekata koja je kreirana fraziranjem JSON odgovora
-    public static ArrayList<Knjiga> extractFeatureFromJson(String jsonString){
+    public static ArrayList<Knjiga> extractFeatureFromJson(String jsonString) {
 
         //prazna lista u koju cemo da dodajemo knjige
         ArrayList<Knjiga> knjigeLista = new ArrayList<>();
@@ -139,22 +140,24 @@ public class QueryUtilis {
             //dolazim do jsonArray pomocu getJSONArray()
             JSONArray jsonArray = rootObject.getJSONArray("items");
             //sve dok ima podataka u JSON nizu izvlacimo ih
-            for (int i = 0;i < jsonArray.length() ; i++){
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
-            JSONObject properties = jsonObject.getJSONObject("volumeInfo");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                JSONObject properties = jsonObject.getJSONObject("volumeInfo");
 
-            String nazivKnjige = properties.getString("title");
-            String autorKnjige = properties.getString("authors");
+                String nazivKnjige = properties.getString("title");
+                String autorKnjige = properties.getString("authors");
                 String coverImagePath = null;
                 JSONObject slikaKnjige = properties.optJSONObject("imageLinks");
                 if (null != slikaKnjige) {
                     coverImagePath = slikaKnjige.optString("thumbnail");
                 }
-
-            //kreiramo novi objekat Knjiga i dajemo nove vrednosti koje smo izvukli iz JSON-a
-            Knjiga knjiga = new Knjiga(nazivKnjige,autorKnjige,coverImagePath);
-                    knjigeLista.add(knjiga);
-
+                //za datu knjigu ekstratovati JSONObject koji je povezan sa kljucem "saleInfo
+                JSONObject saleInfo = jsonObject.getJSONObject("saleInfo");
+                //Ekstraktujem vrednost za kljuc "buyLink"
+                String urlKnjige = (String) saleInfo.get("buyLink");
+                //kreiramo novi objekat Knjiga i dajemo nove vrednosti koje smo izvukli iz JSON-a
+                Knjiga knjiga = new Knjiga(nazivKnjige, autorKnjige, coverImagePath, urlKnjige);
+                knjigeLista.add(knjiga);
 
 
             }
